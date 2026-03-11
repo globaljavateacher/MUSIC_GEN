@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>MusicGen API</title>
+</head>
+<body>
+    <h2>🎵 MusicGen API</h2>
+    <p>디바이스: <b>{{ device }}</b></p>
+
+    <input type="text" id="prompt"
+           placeholder="happy jazz music"
+           style="width:300px; padding:8px">
+    <button onclick="generateMusic()">생성</button>
+    <p id="status"></p>
+    <audio id="player" controls style="display:none; margin-top:10px"></audio>
+
+    <script>
+    async function generateMusic() {
+        const prompt = document.getElementById('prompt').value || 'happy jazz music';
+        const status = document.getElementById('status');
+        const player = document.getElementById('player');
+
+        status.textContent = '⏳ 생성 중...';
+
+        const formData = new FormData();
+        formData.append('prompt', prompt);
+
+        try {
+            const response = await fetch('/generate', {
+                method: 'POST',
+                body: formData
+            });
+
+            const blob = await response.blob();
+            const audioURL = URL.createObjectURL(blob);
+
+            player.src = audioURL;
+            player.style.display = 'block';
+            player.play();
+
+            status.textContent = '✅ 생성 완료!';
+        } catch (err) {
+            status.textContent = '❌ 오류: ' + err.message;
+        }
+    }
+    </script>
+</body>
+</html>
